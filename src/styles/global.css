@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --color-brand: #0a0a0a;
+  --color-brand-inverse: #fafafa;
+  --color-surface: #f5f5f5;
+  --tracking-hero: -0.04em;
+  --tracking-nav: -0.02em;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

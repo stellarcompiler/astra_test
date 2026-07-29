@@ -1,0 +1,414 @@
+# ASTRA Website Prototype - Project Context
+
+## Overview
+
+ASTRA is a premium, frontend-focused website prototype centered around typography-driven storytelling and seamless motion design. The primary objective is to create a memorable first impression through a continuous transformation of the brand name "ASTRA", where the same text element evolves from a loading state into the hero section and finally into the navigation logo.
+
+This is **not** a typical landing page with disconnected animations. The brand identity should feel like one persistent object throughout the experience.
+
+The website should prioritize:
+- Smoothness over flashy effects
+- Premium minimalism
+- Excellent mobile performance
+- Accessibility
+- High Lighthouse scores
+- Zero unnecessary JavaScript
+
+---
+
+# Core Design Philosophy
+
+Every animation must have a purpose.
+
+Avoid decorative animations that distract from content.
+
+The experience should feel:
+- Elegant
+- Intentional
+- Cinematic
+- Responsive
+- Calm
+- Modern
+
+Think Apple, Linear, Stripe, Vercel, Framer, or Awwwards-quality interactions rather than gaming or flashy portfolio websites.
+
+---
+
+# Primary Interaction
+
+## Initial State
+
+On first load:
+
+Display only a large centered text:
+
+ASTRA
+
+No loading spinner.
+
+No progress bar.
+
+The typography itself represents the loading state.
+
+A subtle breathing animation or gentle highlight sweep may be used while assets initialize.
+
+---
+
+## Content Reveal
+
+Instead of removing the loading screen:
+
+The page gradually appears behind the existing ASTRA text.
+
+Background
+Hero
+Navigation
+Content
+
+fade or reveal underneath the stationary typography.
+
+The user should feel that the website is emerging around the brand rather than replacing it.
+
+---
+
+## Hero State
+
+Once loading completes:
+
+ASTRA seamlessly becomes the hero heading.
+
+Example:
+
+ASTRA
+
+Designing intelligent digital experiences.
+
+Only the supporting content fades or slides into view.
+
+The ASTRA text should never disappear or be recreated.
+
+The same DOM element should remain alive.
+
+---
+
+## Scroll Transition
+
+This is the signature interaction.
+
+While scrolling through the hero section:
+
+ASTRA gradually:
+
+- scales down
+- moves toward the top-left
+- adjusts font weight if needed
+- adjusts letter spacing if needed
+
+Eventually becoming the navbar logo.
+
+This transformation must be continuous.
+
+Never:
+
+Fade out hero text.
+
+Fade in logo.
+
+Instead:
+
+One element.
+
+Continuous interpolation.
+
+---
+
+# Animation Principles
+
+Prioritize GPU accelerated properties.
+
+Allowed:
+
+- transform
+- translate3d
+- scale
+- rotate (minimal)
+- opacity
+- filter (used sparingly)
+
+Avoid animating:
+
+- width
+- height
+- left
+- top
+- margin
+- padding
+
+Keep layout recalculations minimal.
+
+Animations should remain smooth on lower-end smartphones.
+
+---
+
+# Motion Style
+
+Animation style should feel:
+
+Slow
+Confident
+Organic
+Premium
+
+Avoid:
+
+Bounce
+Elastic easing
+Exaggerated overshoot
+Fast flashy transitions
+
+Preferred easing:
+
+easeOut
+easeInOut
+Custom cubic-bezier curves
+
+---
+
+# Visual Style
+
+Minimal.
+
+Lots of whitespace.
+
+Strong typography.
+
+Large hero.
+
+Limited color palette.
+
+Clear hierarchy.
+
+No visual clutter.
+
+---
+
+# Typography
+
+Typography is the primary design element.
+
+Large display typography should drive the experience.
+
+Prefer variable fonts.
+
+Possible font families:
+
+- Geist
+- Inter Variable
+- Satoshi
+- General Sans
+- Plus Jakarta Sans
+
+---
+
+# Performance Goals
+
+Optimize primarily for smartphones.
+
+Target:
+
+60 FPS animations
+
+Minimal JavaScript
+
+Minimal layout shift
+
+Minimal blocking resources
+
+Lazy load non-critical assets.
+
+Respect prefers-reduced-motion.
+
+Maintain excellent Lighthouse scores.
+
+---
+
+# Technical Stack
+
+Framework:
+Astro
+
+Language:
+TypeScript
+
+Styling:
+Tailwind CSS
+
+Animations:
+GSAP
+
+Scroll Animations:
+GSAP ScrollTrigger
+
+Smooth Scrolling:
+Lenis
+
+Icons:
+Lucide
+
+Images:
+Optimized AVIF/WebP
+
+Deployment:
+Cloudflare Pages
+
+Version Control:
+GitHub
+
+---
+
+# Astro Architecture
+
+Prefer static rendering.
+
+Hydrate only interactive components.
+
+Use Astro Islands when interactivity is required.
+
+Avoid hydrating the entire page.
+
+Client JavaScript should be limited primarily to animation logic.
+
+---
+
+# Suggested Structure
+
+src/
+
+layouts/
+
+pages/
+
+components/
+    Loader.astro
+    Hero.astro
+    Navbar.astro
+    AstraText.astro
+
+scripts/
+    animation.ts
+    scroll.ts
+
+styles/
+    global.css
+
+public/
+
+---
+
+# Animation Architecture
+
+Maintain a single ASTRA element throughout the lifecycle.
+
+Flow:
+
+Loading
+
+↓
+
+Content Reveal
+
+↓
+
+Hero Heading
+
+↓
+
+Scroll Morph
+
+↓
+
+Navbar Logo
+
+Avoid creating multiple ASTRA elements for different sections.
+
+Animate the same element between states.
+
+---
+
+# Scroll Behavior
+
+The morph begins during hero scroll.
+
+Animation should interpolate continuously based on scroll progress.
+
+Properties include:
+
+position
+
+scale
+
+font size
+
+letter spacing
+
+font weight
+
+The navbar should naturally appear as ASTRA reaches its final position.
+
+---
+
+# Accessibility
+
+Support:
+
+Keyboard navigation
+
+Reduced motion
+
+Proper semantic HTML
+
+Visible focus states
+
+Good contrast ratios
+
+Screen reader compatibility
+
+Animations must never block interaction.
+
+---
+
+# Mobile First
+
+Design for mobile first.
+
+Then progressively enhance for tablets and desktop.
+
+Ensure touch scrolling remains fluid.
+
+Avoid expensive effects on low-powered devices.
+
+---
+
+# Code Quality
+
+Prefer:
+
+Reusable components
+
+Readable architecture
+
+Type-safe code
+
+Modular animation files
+
+Minimal dependencies
+
+Avoid unnecessary abstractions.
+
+---
+
+# Goal
+
+Deliver a premium, typography-first website where the ASTRA wordmark serves as the continuous visual anchor from the first rendered frame until the user finishes scrolling through the hero section.
+
+The user should perceive a single evolving brand element rather than separate loading, hero, and navigation states. The final experience should feel polished, performant, and production-ready while remaining lightweight enough to run smoothly across modern desktop and mobile browsers.
