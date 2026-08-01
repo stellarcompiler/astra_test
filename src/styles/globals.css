@@ -1,0 +1,30 @@
+@import './variables.css';
+@import './typography.css';
+@import './utilities.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-space-black);
+    color: var(--color-pure-white);
+    font-family: var(--font-serif-hero);
+    overflow-x: hidden;
+  }
+}

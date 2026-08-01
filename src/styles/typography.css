@@ -1,0 +1,20 @@
+.font-serif-hero {
+  font-family: var(--font-serif-hero);
+}
+
+.bg-accent-red {
+  background-color: var(--color-accent-red);
+}
+
+/* Fluid Scalable Typography Rules */
+.text-hero-title {
+  font-size: clamp(2.75rem, 8vw, 7.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.015em;
+}
+
+.text-hero-subtitle {
+  font-size: clamp(2.25rem, 6.5vw, 6rem);
+  line-height: 0.88;
+  letter-spacing: -0.015em;
+}
