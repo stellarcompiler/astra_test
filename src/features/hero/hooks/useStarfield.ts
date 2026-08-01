@@ -25,6 +25,7 @@ const MOBILE_STAR_COUNT = 80;
 const DESKTOP_STAR_COUNT = 300;
 
 const STAR_RADIUS = 0.8;
+const CONTENT_PADDING = 24;
 
 /** Deterministic PRNG (mulberry32). The same seed always produces the same constellation. */
 function mulberry32(seed: number): () => number {
@@ -56,9 +57,9 @@ function isInsideRect(x: number, y: number, rect: Rect): boolean {
  * distance to the centre, so the pulse reads as a gradual brightness wave:
  * rings closer to the centre brighten first, then dim as the brightness
  * travels outward. Stars are simple, uniform dots and none are placed behind
- * the hero container.
+ * the hero's text content.
  */
-function createStars(viewportWidth: number, viewportHeight: number, heroRect: Rect): Star[] {
+function createStars(viewportWidth: number, viewportHeight: number, contentRect: Rect | null): Star[] {
   const centerX = viewportWidth / 2;
   const centerY = viewportHeight / 2;
 
@@ -85,8 +86,8 @@ function createStars(viewportWidth: number, viewportHeight: number, heroRect: Re
     const cx = random() * viewportWidth;
     const cy = random() * viewportHeight;
 
-    // Keep the hero content readable: never place a star behind it.
-    if (isInsideRect(cx, cy, heroRect)) continue;
+    // Keep the hero text readable: never place a star behind it.
+    if (contentRect && isInsideRect(cx, cy, contentRect)) continue;
 
     const distance = distanceBetween(cx, cy, centerX, centerY);
     generated.push({
@@ -109,20 +110,41 @@ function createStars(viewportWidth: number, viewportHeight: number, heroRect: Re
  * changes — so the stars always fill the whole screen. Recomputes are
  * coalesced through `requestAnimationFrame` to avoid wasted work during
  * drag-resize, and the fixed seed keeps the pattern identical at every size.
+ *
+ * Only the hero's text content is kept star-free (tightly padded), not the
+ * full hero container box, so the stars populate all around the hero without
+ * leaving a rectangular dead zone around it.
  */
-export function useStarfield(containerRef: RefObject<HTMLElement | null>): Star[] {
+export function useStarfield(contentRef: RefObject<HTMLElement | null>): Star[] {
   const [stars, setStars] = useState<Star[]>([]);
 
   useLayoutEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const content = contentRef.current;
+    if (!content) return;
 
     let frame = 0;
+    let lastWidth = 0;
+    let lastHeight = 0;
 
     const generate = () => {
       frame = 0;
       const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
-      setStars(createStars(viewportWidth, viewportHeight, container.getBoundingClientRect()));
+
+      // Skip regenerating when the viewport size hasn't actually changed.
+      if (viewportWidth === lastWidth && viewportHeight === lastHeight) return;
+
+      lastWidth = viewportWidth;
+      lastHeight = viewportHeight;
+
+      const contentRect = content.getBoundingClientRect();
+      const paddedRect: Rect = {
+        left: contentRect.left - CONTENT_PADDING,
+        top: contentRect.top - CONTENT_PADDING,
+        right: contentRect.right + CONTENT_PADDING,
+        bottom: contentRect.bottom + CONTENT_PADDING,
+      };
+
+      setStars(createStars(viewportWidth, viewportHeight, paddedRect));
     };
 
     const scheduleGenerate = () => {
@@ -141,7 +163,7 @@ export function useStarfield(containerRef: RefObject<HTMLElement | null>): Star[
       window.removeEventListener('resize', scheduleGenerate);
       document.removeEventListener('fullscreenchange', scheduleGenerate);
     };
-  }, [containerRef]);
+  }, [contentRef]);
 
   return stars;
 }

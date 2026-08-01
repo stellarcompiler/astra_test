@@ -12,6 +12,9 @@ export const Moon: React.FC = () => {
         alt=""
         className="h-[70%] w-auto object-contain"
         style={{ transform: 'translateY(-30px)' }}
+        loading="eager"
+        decoding="async"
+        fetchPriority="low"
       />
     </div>
   );

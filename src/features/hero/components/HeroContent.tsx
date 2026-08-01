@@ -1,8 +1,15 @@
 import React from 'react';
 
-export const HeroContent: React.FC = () => {
+interface HeroContentProps {
+  contentRef?: React.Ref<HTMLHeadingElement>;
+}
+
+export const HeroContent: React.FC<HeroContentProps> = ({ contentRef }) => {
   return (
-    <h1 className="inline-flex flex-col items-start justify-center z-10 font-serif-hero text-white">
+    <h1
+      ref={contentRef}
+      className="inline-flex flex-col items-start justify-center z-10 font-serif-hero text-white"
+    >
       <span className="text-hero-title uppercase leading-none tracking-tight">ASTRA</span>
       <span
         className="flex items-center gap-3 mt-0.5 text-hero-subtitle uppercase leading-none tracking-tight"

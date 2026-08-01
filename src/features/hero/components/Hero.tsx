@@ -5,8 +5,8 @@ import { Starfield } from './Starfield';
 import { useStarfield } from '../hooks/useStarfield';
 
 export const Hero: React.FC = () => {
-  const heroContainerRef = useRef<HTMLDivElement>(null);
-  const stars = useStarfield(heroContainerRef);
+  const heroContentRef = useRef<HTMLHeadingElement>(null);
+  const stars = useStarfield(heroContentRef);
 
   return (
     <section
@@ -15,12 +15,11 @@ export const Hero: React.FC = () => {
     >
       <Starfield stars={stars} />
       <div
-        ref={heroContainerRef}
         className="absolute left-1/2 top-1/2 w-[756px] h-[429px] max-w-[90vw] max-h-[80vh]"
         style={{ aspectRatio: '756 / 429', containerType: 'inline-size', transform: 'translate(-58.9%, -50%)' }}
       >
         <div className="relative z-10 h-full w-full flex items-center justify-center">
-          <HeroContent />
+          <HeroContent contentRef={heroContentRef} />
         </div>
         <Moon />
       </div>
