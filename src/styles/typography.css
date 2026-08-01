@@ -6,15 +6,21 @@
   background-color: var(--color-accent-red);
 }
 
-/* Fluid Scalable Typography Rules */
+/*
+ * Fluid Scalable Typography Rules
+ *
+ * The first font-size declaration is a progressive-enhancement fallback for
+ * browsers without container query unit (cqw) support. Browsers that support
+ * cqw apply the second declaration and keep the container-relative sizing the
+ * hero design relies on. line-height/letter-spacing intentionally stay on the
+ * component's Tailwind utilities (leading-none / tracking-tight).
+ */
 .text-hero-title {
-  font-size: clamp(2.75rem, 8vw, 7.5rem);
-  line-height: 0.88;
-  letter-spacing: -0.015em;
+  font-size: clamp(3rem, 12vw, 7.5rem);
+  font-size: clamp(3rem, 12cqw, 7.5rem);
 }
 
 .text-hero-subtitle {
-  font-size: clamp(2.25rem, 6.5vw, 6rem);
-  line-height: 0.88;
-  letter-spacing: -0.015em;
+  font-size: clamp(2.5rem, 10vw, 6rem);
+  font-size: clamp(2.5rem, 10cqw, 6rem);
 }

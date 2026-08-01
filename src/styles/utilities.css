@@ -1,1 +1,39 @@
 /* Utility classes */
+
+/*
+ * Starfield dots
+ *
+ * The `ripple-pulse` keyframes animate opacity and transform only — both are
+ * compositor-friendly and avoid repaint cost on mobile. `transform-box:
+ * fill-box` + `transform-origin: center` makes each SVG circle scale from its
+ * own center instead of the SVG viewport origin.
+ */
+.star {
+  fill: var(--color-pure-white);
+  opacity: 0.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple-pulse 4000ms ease-in-out infinite;
+}
+
+@keyframes ripple-pulse {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star {
+    animation: none;
+    opacity: 0.5;
+  }
+}
