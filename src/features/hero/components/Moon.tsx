@@ -10,10 +10,10 @@ export const Moon: React.FC = () => {
       <img
         src={MoonSVG}
         alt=""
-        className="h-auto w-[40vw] max-w-[160px] md:h-[70%] md:w-auto md:max-w-none md:-translate-y-[30px] object-contain"
+        className="h-auto w-[40vw] max-w-[160px] object-contain md:h-[70%] md:w-auto md:max-w-none md:-translate-y-[30px]"
         loading="eager"
         decoding="async"
-        fetchPriority="low"
+        fetchPriority="high"
       />
     </div>
   );

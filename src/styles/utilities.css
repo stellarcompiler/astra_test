@@ -3,37 +3,45 @@
 /*
  * Starfield dots
  *
- * The `ripple-pulse` keyframes animate opacity and transform only — both are
- * compositor-friendly and avoid repaint cost on mobile. `transform-box:
- * fill-box` + `transform-origin: center` makes each SVG circle scale from its
- * own center instead of the SVG viewport origin.
+ * Stars are simple SVG dots. A small number of distance bands animate opacity,
+ * avoiding one independent animation per dot on smartphone browsers.
  */
-.star {
+.star-group {
   fill: var(--color-pure-white);
-  opacity: 0.2;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: ripple-pulse 4000ms ease-in-out infinite;
+  opacity: 0.35;
+  animation: ripple-pulse var(--ripple-duration) ease-in-out infinite;
+}
+
+.hero-composition {
+  width: min(756px, 90vw, calc(80vh * 1.762));
+}
+
+@supports (height: 100dvh) {
+  .hero-composition {
+    width: min(756px, 90vw, calc(80dvh * 1.762));
+    max-height: 80dvh;
+  }
+}
+
+.starfield {
+  --ripple-duration: 2470ms;
 }
 
 @keyframes ripple-pulse {
   0% {
-    opacity: 0.2;
-    transform: scale(0.8);
+    opacity: 0.35;
   }
   50% {
     opacity: 1;
-    transform: scale(1.2);
   }
   100% {
-    opacity: 0.2;
-    transform: scale(0.8);
+    opacity: 0.35;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .star {
+  .star-group {
     animation: none;
-    opacity: 0.5;
+    opacity: 0.65;
   }
 }

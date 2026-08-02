@@ -6,7 +6,7 @@ export interface Star {
   cx: number;
   cy: number;
   r: number;
-  delay: number;
+  delayRatio: number;
 }
 
 interface Rect {
@@ -16,16 +16,18 @@ interface Rect {
   bottom: number;
 }
 
-const RIPPLE_DURATION_MS = 4000;
 const RIPPLE_SAFETY_FACTOR = 0.85;
 const SEED = 0x2a3f;
 
-const MOBILE_BREAKPOINT_PX = 768;
 const MOBILE_STAR_COUNT = 80;
-const DESKTOP_STAR_COUNT = 300;
+const DESKTOP_STAR_COUNT = 350;
 
-const STAR_RADIUS = 0.8;
+const STAR_RADIUS = 0.84;
 const CONTENT_PADDING = 24;
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.min(maximum, Math.max(minimum, value));
+}
 
 /** Deterministic PRNG (mulberry32). The same seed always produces the same constellation. */
 function mulberry32(seed: number): () => number {
@@ -63,8 +65,11 @@ function createStars(viewportWidth: number, viewportHeight: number, contentRect:
   const centerX = viewportWidth / 2;
   const centerY = viewportHeight / 2;
 
-  const starCount =
-    viewportWidth < MOBILE_BREAKPOINT_PX ? MOBILE_STAR_COUNT : DESKTOP_STAR_COUNT;
+  const starCount = clamp(
+    Math.round((viewportWidth * viewportHeight) / 3000),
+    MOBILE_STAR_COUNT,
+    DESKTOP_STAR_COUNT,
+  );
   const random = mulberry32(SEED);
 
   const corners = [
@@ -74,7 +79,6 @@ function createStars(viewportWidth: number, viewportHeight: number, contentRect:
     distanceBetween(viewportWidth, viewportHeight, centerX, centerY),
   ];
   const maxDistance = Math.max(...corners);
-  const speedConstant = (RIPPLE_SAFETY_FACTOR * RIPPLE_DURATION_MS) / maxDistance;
 
   const generated: Star[] = [];
   const maxAttempts = starCount * 10;
@@ -95,7 +99,8 @@ function createStars(viewportWidth: number, viewportHeight: number, contentRect:
       cx,
       cy,
       r: STAR_RADIUS,
-      delay: -distance * speedConstant,
+      // A positive distance delay makes the centre reach the bright part first.
+      delayRatio: (distance / maxDistance) * RIPPLE_SAFETY_FACTOR,
     });
   }
 
@@ -115,34 +120,53 @@ function createStars(viewportWidth: number, viewportHeight: number, contentRect:
  * full hero container box, so the stars populate all around the hero without
  * leaving a rectangular dead zone around it.
  */
-export function useStarfield(contentRef: RefObject<HTMLElement | null>): Star[] {
+export function useStarfield(
+  heroRef: RefObject<HTMLElement | null>,
+  contentRef: RefObject<HTMLElement | null>,
+): Star[] {
   const [stars, setStars] = useState<Star[]>([]);
 
   useLayoutEffect(() => {
+    const hero = heroRef.current;
     const content = contentRef.current;
-    if (!content) return;
+    if (!hero || !content) return;
 
     let frame = 0;
     let lastWidth = 0;
     let lastHeight = 0;
+    let lastContentRect = '';
 
     const generate = () => {
       frame = 0;
-      const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
+      const heroRect = hero.getBoundingClientRect();
+      const viewportWidth = heroRect.width;
+      const viewportHeight = heroRect.height;
+      if (viewportWidth === 0 || viewportHeight === 0) return;
 
-      // Skip regenerating when the viewport size hasn't actually changed.
-      if (viewportWidth === lastWidth && viewportHeight === lastHeight) return;
+      const contentRect = content.getBoundingClientRect();
+      const relativeContentRect = {
+        left: contentRect.left - heroRect.left,
+        top: contentRect.top - heroRect.top,
+        right: contentRect.right - heroRect.left,
+        bottom: contentRect.bottom - heroRect.top,
+      };
+      const paddedRect: Rect = {
+        left: relativeContentRect.left - CONTENT_PADDING,
+        top: relativeContentRect.top - CONTENT_PADDING,
+        right: relativeContentRect.right + CONTENT_PADDING,
+        bottom: relativeContentRect.bottom + CONTENT_PADDING,
+      };
+
+      const contentRectKey = Object.values(relativeContentRect).join(',');
+      if (
+        viewportWidth === lastWidth &&
+        viewportHeight === lastHeight &&
+        contentRectKey === lastContentRect
+      ) return;
 
       lastWidth = viewportWidth;
       lastHeight = viewportHeight;
-
-      const contentRect = content.getBoundingClientRect();
-      const paddedRect: Rect = {
-        left: contentRect.left - CONTENT_PADDING,
-        top: contentRect.top - CONTENT_PADDING,
-        right: contentRect.right + CONTENT_PADDING,
-        bottom: contentRect.bottom + CONTENT_PADDING,
-      };
+      lastContentRect = contentRectKey;
 
       setStars(createStars(viewportWidth, viewportHeight, paddedRect));
     };
@@ -158,12 +182,19 @@ export function useStarfield(contentRef: RefObject<HTMLElement | null>): Star[] 
     window.addEventListener('resize', scheduleGenerate);
     document.addEventListener('fullscreenchange', scheduleGenerate);
 
+    const resizeObserver = typeof ResizeObserver === 'undefined'
+      ? null
+      : new ResizeObserver(scheduleGenerate);
+    resizeObserver?.observe(hero);
+    resizeObserver?.observe(content);
+
     return () => {
       if (frame !== 0) cancelAnimationFrame(frame);
       window.removeEventListener('resize', scheduleGenerate);
       document.removeEventListener('fullscreenchange', scheduleGenerate);
+      resizeObserver?.disconnect();
     };
-  }, [contentRef]);
+  }, [contentRef, heroRef]);
 
   return stars;
 }
